@@ -6,7 +6,7 @@ Final Project - Yelp Dataset Visualization
 ### Senthil Ramachandran
 
 -
-In this project, we visualized restaurants data in Montreal. We want to provide a better user experience for selecting restaurants.
+In this project, I visualized restaurants data in Montreal. We want to provide a better user experience for selecting restaurants.
 
 ### Map functions
 
