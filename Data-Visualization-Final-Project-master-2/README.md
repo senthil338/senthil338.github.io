@@ -30,7 +30,7 @@ The histogram on the bottom left shows a distribution of number of restaurants o
 ![map](img/business_info_1.png)
 When you click on a restaurant in the map, it will bring up a panel from the right side of the screen showing the detail information about this restaurant, including name, rating stars, price range, address, and categories. This is the checkin heatmap.  It shows the number of checkins in a week. Each rectangle represents number of checkins in a hour. We can see what time in a day and what day in a week this restaurant is busy so we can maybe avoid the peak hour. We implemented a rating distribution barchart. It shows the percentage of reviews in each rating level. When you click on the bar it will bring up a second panel listing all the reviews in this rating. When finish reading, you can simply click on the review panel to hide the review. Or you can click on the map to hide both review and detail info panel.
 
-###final design
+### Final design
 ![map](img/finaldesign.png)
 This is our final design and all the interaction part were described in the previous sections.
 
