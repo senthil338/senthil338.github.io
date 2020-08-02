@@ -109,19 +109,7 @@ var svg = d3.select("body").append("svg")
       .style("width", width + margin.left + margin.right + "px")
       .style("height", height + margin.bottom + margin.top + "px");
 
-// var grandparent = svg.append("g")
-//       .attr("class", "grandparent");
-  
-//   grandparent.append("rect")
-//       .attr("fill", "grey")
-//       .attr("y", -margin.top)
-//       .attr("width", width)
-//       .attr("height", margin.top);
-  
-//   grandparent.append("text")
-//       .attr("x", 6)
-//       .attr("y", 6 - margin.top)
-//       .attr("dy", ".75em");
+
 
 var g1 = svg.insert("g", ".grandparent")
         .attr("class", "depth")
@@ -283,13 +271,7 @@ function dragging(){
 }
 
 function main(root){
-  //console.log(root);
 
-    // grandparent
-    //     .datum(root.parent)
-    //     //.on("click", transition)
-    //   .select("text")
-    //     //.text(name(d));
 
 
   var node = g1
@@ -303,11 +285,7 @@ function main(root){
       .attr("y", function(d) { return d.y0; })
       .attr("width", function(d) { return d.x1 - d.x0 ; })
       .attr("height", function(d) { return d.y1 - d.y0 ; })
-      // .style("fill", "#b2ff66")
-      // .style("left", function(d) { return d.x0 + "px"; })
-      // .style("top", function(d) { return d.y0 + "px"; })
-      // .style("width", function(d) { return d.x1 - d.x0 + "px"; })
-      // .style("height", function(d) { return d.y1 - d.y0 + "px"; });
+
 
   g1.selectAll(".node_text")
       .data(root.leaves()).enter()
@@ -340,11 +318,7 @@ function update(d){
     .attr("y", function(d) { return d.y0; })
     .attr("width", function(d) { return d.x1 - d.x0 ; })
     .attr("height", function(d) { return d.y1 - d.y0 ; })
-      // .style("fill", function(d) { return color(d.data.key); })
-      // .style("left", function(d) { return d.x0 + "px"; })
-      // .style("top", function(d) { return d.y0 + "px"; })
-      // .style("width", function(d) { return d.x1 - d.x0 + "px"; })
-      // .style("height", function(d) { return d.y1 - d.y0 + "px"; });
+
 
 
     node.enter()
@@ -356,11 +330,7 @@ function update(d){
     .attr("y", function(d) { return d.y0; })
     .attr("width", function(d) { return d.x1 - d.x0 ; })
     .attr("height", function(d) { return d.y1 - d.y0 ; })
-      // .style("fill", function(d) { return color(d.data.key); })
-      // .style("left", function(d) { return d.x0 + "px"; })
-      // .style("top", function(d) { return d.y0 + "px"; })
-      // .style("width", function(d) { return d.x1 - d.x0 + "px"; })
-      // .style("height", function(d) { return d.y1 - d.y0 + "px"; });
+
 
 
     node.exit().remove();

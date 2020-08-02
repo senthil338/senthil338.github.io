@@ -5,8 +5,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    <meta name="description" content="This is course project for WPI data visualization.">
-    <meta name="author" content="Yihao Zhou">
+    <meta name="description" content="This is final project for data visualization.">
+    <meta name="author" content="Senthil Ramachandran">
     <link rel="icon" href="../../favicon.ico">
 
     <title>Yelp Data Visualization</title>
@@ -31,23 +31,23 @@
     <script src="https://d3js.org/topojson.v1.min.js"></script>
 
     <!-- js charts for visualization -->
-    <script src="js/symbol_map.js"></script>
-    <script src="js/histogram.js"></script>
-    <script src="js/stacked.js"></script>
-    <script src="js/heatmap.js"></script>
-    <script src="js/treemap.js"></script>
-    <script src="js/business_info.js"></script>
-    <script src="js/suggestion.js"></script>
-    <script src="js/viewport.js"></script>
+    <script src="dist/js/symbol_map.js"></script>
+    <script src="dist/js/histogram.js"></script>
+    <script src="dist/js/stacked.js"></script>
+    <script src="dist/js/heatmap.js"></script>
+    <script src="dist/js/treemap.js"></script>
+    <script src="dist/js/business_info.js"></script>
+    <script src="dist/js/suggestion.js"></script>
+    <script src="dist/js/viewport.js"></script>
 
     <!-- js library for map -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.5/leaflet.js"></script>
 
 
-    <link href='dist/css/project_style.css' rel='stylesheet'/>
+    <!--<link href='dist/css/project_style.css' rel='stylesheet'/>
     <link href='l.geosearch.css' rel='stylesheet'/>
     <script src="l.control.geosearch.js"></script>
-    <script src="l.geosearch.provider.esri.js"></script>
+    <script src="l.geosearch.provider.esri.js"></script>-->
     <link rel="stylesheet" type="text/css"
           href="https://fonts.googleapis.com/css?family=Bree+Serif">
 
@@ -76,18 +76,13 @@
             <ul class="nav navbar-nav">
                 <li class="active"><a href="index.html">Home</a></li>
                 <li><a href="about.html">About</a></li>
-                <li><a href="contact.html">Contact</a></li>
+               <!-- <li><a href="contact.html">Contact</a></li>-->
             </ul>
         </div><!--/.nav-collapse -->
     </div>
 </nav>
 
-<!--<div class="container">-->
 
-<!--<div class="starter-template">-->
-<!--<h1>Bootstrap starter template</h1>-->
-<!--<p class="lead">Use this document as a way to quickly start any new project.<br> All you get is this text and a mostly barebones HTML document.</p>-->
-<!--</div>-->
 
 <div id="home" class="container-fluid">
     <div id="map"></div>
@@ -101,7 +96,172 @@
 <!--</div>&lt;!&ndash; /.container &ndash;&gt;-->
 
 <!-- D3 Visualization Javascript -->
+<script type="text/javascript">
+if(!d3.chart) d3.chart = {};
 
+d3.chart.heatmap = function() {
+    var dispatch = d3.dispatch(chart, "hover");
+    var g;
+    var margin = {top: 6, right: 0, bottom: 0, left: 6},
+        width = 200,
+        height = 100,
+
+        gridWidth = Math.floor((width - 15) / 24),
+        gridHeight = Math.floor((height - 15) / 7),
+        grid_x_offset =  0,
+        legendElementWidth = gridWidth,
+        buckets = 9,
+        rawdata,
+        colors = ['#f7fbff','#deebf7','#c6dbef','#9ecae1','#6baed6','#4292c6','#2171b5','#08519c','#08306b'],
+        days = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"],
+        times = [ "4a", "8a", "12a", "4p", "8p", "12p"];
+
+    var data = [];
+
+
+
+    function chart(container) {
+        g = container;
+
+        processData(rawdata);
+
+        create(data);
+    }
+
+// change raw data format to {day, hour, value}
+    function processData(dataset) {
+
+        for (i = 0; i < 7; i++) {
+            for (j = 0; j < 24; j++) {
+                data.push({day: i, hour: j, value: 0});
+            }
+        }
+
+        for (var property in dataset) {
+            if (dataset.hasOwnProperty(property)) {
+                var temp = property.split("-");
+                for (var item in data) {
+                    if (data[item].day == +temp[1] && data[item].hour == +temp[0]) {
+                        data[item].value = dataset[property];
+                    }
+                }
+
+            }
+        }
+
+    }
+
+
+    var create = function (data) {
+
+        g.attr("width", width)
+            .attr("height", height)
+            .attr("transform", "translate(" + (right_panel_width - right_panel_padding * 2 - width) + "," + 20 + ")");
+        var dayLabels = g.selectAll(".dayLabel")
+            .data(days)
+            .enter().append("text")
+            .text(function (d) {
+                return d;
+            })
+            .attr("x", 0)
+            .attr("y", function (d, i) {
+                return i * gridHeight;
+            })
+            .style("text-anchor", "end")
+            .attr("transform", "translate(0," + (margin.top+8) + ")")
+            .attr("class", function (d, i) {
+                return ((i >= 1 && i <= 5) ? "dayLabel mono axis axis-workweek" : "dayLabel mono axis");
+            });
+
+        var timeLabels = g.selectAll(".timeLabel")
+            .data(times)
+            .enter().append("text")
+            .text(function (d) {
+                return d;
+            })
+            .attr("x", function (d, i) {
+                return i * gridWidth * 4 + gridWidth;
+            })
+            .attr("y", 0)
+            .style("text-anchor", "middle")
+            .attr("transform", "translate(" + (margin.left+6) + ", 0)")
+            .attr("class", function (d, i) {
+                return ((i >= 1 && i <= 4) ? "timeLabel mono axis axis-worktime" : "timeLabel mono axis");
+            });
+
+        var colorScale = d3.scaleQuantile()
+            .domain([0,1,2,3,4,5,6,7,8])
+            .range(colors);
+
+        var cards = g.selectAll(".hour")
+            .data(data, function (d) {
+                return d.day + ':' + d.hour;
+            });
+
+        cards.enter().append("rect")
+            .attr("x", function (d) {
+                return (d.hour) * gridWidth + margin.left;
+            })
+            .attr("y", function (d) {
+                return (d.day) * gridHeight + margin.top;
+            })
+            .attr("rx", 4)
+            .attr("ry", 4)
+            .attr("class", "hour bordered")
+            .attr("width", gridWidth)
+            .attr("height", gridHeight)
+            .style("fill", function(d) { return colorScale(0); })
+            .transition().duration(200)
+            .style("fill", function(d) { return colorScale(d.value); });
+
+
+
+    }
+
+
+    //combination getter and setter for the data attribute of the global chart variable
+    chart.data = function(value) {
+        if(!arguments.length) return rawdata;
+        rawdata = value;
+        // console.log(rawdata)
+        return chart;
+    }
+
+    //combination getter and setter for the width attribute of the global chart variable
+    chart.width = function(value) {
+        if(!arguments.length) return width;
+        width = value;
+        return chart;
+    }
+
+    //combination getter and setter for the height attribute of the global chart variable
+    chart.height = function(value) {
+        if(!arguments.length) return height;
+        height = value;
+        return chart;
+    }
+
+    return d3.rebind(chart, dispatch, "on");
+}
+
+// Copies a variable number of methods from source to target.
+d3.rebind = function(target, source) {
+    var i = 1, n = arguments.length, method;
+    while (++i < n) target[method = arguments[i]] = d3_rebind(target, source, source[method]);
+    return target;
+};
+
+// Method is assumed to be a standard D3 getter-setter:
+// If passed with no arguments, gets the value.
+// If passed with arguments, sets the value and returns the target.
+function d3_rebind(target, source, method) {
+    return function() {
+        var value = method.apply(source, arguments);
+        return value === source ? target : value;
+    };
+}
+
+</script>
 <script type="text/javascript">
 
     var Vis = {};
@@ -242,11 +402,7 @@
 
         map.on('moveend', function () {
             var data = [];
-            // console.log(map.getBounds().getSouth());
-            // console.log(map.getBounds().getNorth());
-            // console.log(map.getBounds().getEast());
-            // console.log(map.getBounds().getWest());
-            // console.log(Vis.data[0]);
+
 
             for (i in Vis.data) {
 
@@ -302,7 +458,7 @@
 
         // Create Heatmap
         var hmgroup = svg_right.append("g").attr("id", "heatmap");
-//            .attr("transform", "translate( " + (right_panel_width / 2 - right_panel_padding - 100) + " , " + 0 + " )");
+
         var heatmap = d3.chart.heatmap();
         heatmap.data([]);
         heatmap(hmgroup);
@@ -323,19 +479,9 @@
                 })
                 symbol_map.data(v)
                 symbol_map.update();
-                //symbol_map.highlight(v);
-                //console.log(v);
-//                treemap.data(v, Vis.tree)
-//                treemap.update()
+
             }
-            //console.log(v);
-            //symbol_map.highlight(v);
-            else {
-//                symbol_map.data(data)
-//                symbol_map.update();
-//                treemap.data(Vis.data, Vis.tree)
-//                treemap.update()
-            }
+
 
 
         })
@@ -360,9 +506,7 @@
             histogram.highlight(hovered)
             treemap.highlight(hovered)
 
-//            console.log(hovered)
-//            d3.select("#rightpanel").transition().duration(200)
-//                .style("right", -right_panel_width + 10 + "px");
+
 
             if (hovered.length !== 0) {
 
@@ -468,8 +612,7 @@
                 histogram.update()
                 v = [];
             }
-            //console.log(v);
-            //symbol_map.highlight(v);
+
             else {
                 d3.select("#suggestionpanel")
                     .style("top", - height_map + 50  + "px");
@@ -481,11 +624,7 @@
                     .style("right", -review_panel_width + "px");
 
                 update_text("Total: " + data.length);
-//                data.forEach(function (d) {
-//                    if (d.stars >= treemap.starlevel()) {
-//                        data_2.push(d);
-//                    }
-//                });
+
 
                 treemap.starlevel()
                 symbol_map.data(data)
@@ -534,27 +673,15 @@
                 })
                 symbol_map.data(v)
                 symbol_map.update();
-                //symbol_map.highlight(v);
-                //console.log(v);
-//                treemap.data(v, Vis.tree)
-//                treemap.update()
+
             }
-            //console.log(v);
-            //symbol_map.highlight(v);
-            else {
-//                symbol_map.data(data)
-//                symbol_map.update();
-//                treemap.data(Vis.data, Vis.tree)
-//                treemap.update()
-            }
+
         })
         histogram.on("click", function (clicked) {
             //console.log(clicked);
             var v = [];
             data.forEach(function (d) {
-                // if (clicked[0].indexOf(d.review_count) !== -1) {
-                //     v.push(d);
-                // }
+
                 if(d.review_count>=clicked[0].x0){
                     v.push(d);
                 }
@@ -678,11 +805,7 @@
                     .style("top", - height_map + 50 + "px");
                 update_text("Total: " + data.length);
 
-//                data.forEach(function (d) {
-//                    if (d.stars >= treemap.starlevel()) {
-//                        data_2.push(d);
-//                    }
-//                });
+
 
                 symbol_map.data(data)
                 symbol_map.update();
